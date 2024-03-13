@@ -25,6 +25,11 @@ export const ProfileScreen = ({ navigation }) => {
   }, []);
 
   const saveData = async () => {
+
+    if (!isValidPhoneNumber(phoneNumber)) {
+    Alert.alert("Invalid Phone Number", "Please enter a valid US phone number.");
+    return;
+  }
     try {
       await AsyncStorage.setItem(
         'userData',
@@ -40,6 +45,11 @@ export const ProfileScreen = ({ navigation }) => {
     await AsyncStorage.removeItem('userData');
     navigation.navigate('Onboarding');
   };
+
+  const isValidPhoneNumber = (phoneNumber) => {
+  const phoneNumberRegex = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
+  return phoneNumberRegex.test(phoneNumber);
+};
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -57,7 +67,13 @@ export const ProfileScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Button title="Pick an image from camera roll" onPress={pickImage} />
-      {profileImage && <Image source={{ uri: profileImage }} style={styles.profileImage} />}
+      {profileImage ? (
+        <Image source={{ uri: profileImage }} style={styles.profileImage} />
+      ) : (
+        <Text style={styles.profileImagePlaceholder}>
+          {name.charAt(0)}{email.charAt(0)}
+        </Text>
+      )}
       <TextInput style={styles.input} placeholder="Name" value={name} onChangeText={setName} />
       <TextInput style={styles.input} placeholder="Email" value={email} onChangeText={setEmail} keyboardType="email-address" />
       <TextInput style={styles.input} placeholder="Phone Number" value={phoneNumber} onChangeText={setPhoneNumber} keyboardType="phone-pad" />
@@ -90,9 +106,9 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 50,
+    height: 50,
+    borderRadius: 20,
     marginBottom: 20,
   },
 });
