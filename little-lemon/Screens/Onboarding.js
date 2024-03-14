@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Image } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Image, Alert } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const OnboardingScreen = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const navigation = useNavigation();
   
   const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -17,6 +20,25 @@ export const OnboardingScreen = () => {
   const isFormValid = () => {
     return isNameValid(name) && isValidEmail(email);
   };
+
+  const saveOnboardingData = async () => {
+    if (isFormValid()) {
+      try {
+        await AsyncStorage.setItem('userData', JSON.stringify({ name, email }));
+        await AsyncStorage.setItem('onboardingCompleted', 'true');
+        navigation.navigate('Home');
+      } catch (error) {
+        Alert.alert("Error", "Failed to save user data.");
+      }
+    } else {
+      Alert.alert("Validation failed", "Please check your input.");
+    }
+  };
+
+  // const goToHomeScreen = async () => {
+  //   await AsyncStorage.setItem('onboardingCompleted', 'true');
+  //   navigation.navigate('Home');
+  // };
 
   return (
     <View style={styles.container}>
@@ -38,10 +60,17 @@ export const OnboardingScreen = () => {
         onChangeText={setEmail}
       />
       <Button
+      title="Next"
+      color="#841584" 
+      style={styles.nextButton}
+      onPress={saveOnboardingData}
+      disabled={!isFormValid()}
+    />
+     {/* <Button
         title="Next"
-        onPress={() => {}}
-        disabled={!isFormValid()}
-      />
+        color="#841584" 
+        onPress={goToHomeScreen}
+      /> */}
     </View>
   );
 };
@@ -51,7 +80,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'pink'
+    backgroundColor: 'lightyellow'
   },
   header: {
     flexDirection: 'column',
@@ -85,5 +114,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     textAlign: 'center',
+  },
+  nextButton: {
+    width: '80%',
+    padding: 10,
+    margin: 10,
+    borderRadius: 15,
   },
 });

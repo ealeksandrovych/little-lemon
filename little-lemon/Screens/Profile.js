@@ -25,16 +25,12 @@ export const ProfileScreen = ({ navigation }) => {
   }, []);
 
   const saveData = async () => {
-
     if (!isValidPhoneNumber(phoneNumber)) {
-    Alert.alert("Invalid Phone Number", "Please enter a valid US phone number.");
-    return;
-  }
-    try {
-      await AsyncStorage.setItem(
-        'userData',
-        JSON.stringify({ name, email, phoneNumber, profileImage, emailNotifications })
-      );
+      Alert.alert("Invalid Phone Number", "Please enter a valid US phone number.");
+      return;
+    }
+     try {
+      await AsyncStorage.setItem('userData', JSON.stringify({ name, email, phoneNumber, profileImage, emailNotifications }));
       Alert.alert("Data Saved", "Your profile information has been saved successfully.");
     } catch (error) {
       Alert.alert("Error", "Failed to save the data.");
@@ -64,8 +60,13 @@ export const ProfileScreen = ({ navigation }) => {
     }
   };
 
+const nav = useNavigation();
+
   return (
     <View style={styles.container}>
+    <TouchableOpacity onPress={() => nav.goBack()} style={styles.backButton}>
+        <Text>Back</Text>
+      </TouchableOpacity>
       <Button title="Pick an image from camera roll" onPress={pickImage} />
       {profileImage ? (
         <Image source={{ uri: profileImage }} style={styles.profileImage} />
@@ -110,6 +111,11 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 20,
     marginBottom: 20,
+  },
+  backButton: {
+    padding: 10,
+    margin: 10,
+    backgroundColor: '#ddd',
   },
 });
 
