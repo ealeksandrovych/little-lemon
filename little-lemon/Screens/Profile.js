@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, Switch, Image, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, Button, Switch, Image, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 
-export const ProfileScreen = ({ navigation }) => {
+export const ProfileScreen = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [profileImage, setProfileImage] = useState(null);
   const [emailNotifications, setEmailNotifications] = useState(false);
+  const navigation = useNavigation();
 
   useEffect(() => {
     (async () => {
@@ -29,7 +31,7 @@ export const ProfileScreen = ({ navigation }) => {
       Alert.alert("Invalid Phone Number", "Please enter a valid US phone number.");
       return;
     }
-     try {
+    try {
       await AsyncStorage.setItem('userData', JSON.stringify({ name, email, phoneNumber, profileImage, emailNotifications }));
       Alert.alert("Data Saved", "Your profile information has been saved successfully.");
     } catch (error) {
@@ -37,15 +39,21 @@ export const ProfileScreen = ({ navigation }) => {
     }
   };
 
+  // const logout = async () => {
+  //   await AsyncStorage.removeItem('userData');
+  //   navigation.navigate('Onboarding');
+  // };
+
   const logout = async () => {
     await AsyncStorage.removeItem('userData');
+    await AsyncStorage.setItem('onboardingCompleted', 'false');
     navigation.navigate('Onboarding');
   };
 
   const isValidPhoneNumber = (phoneNumber) => {
-  const phoneNumberRegex = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
-  return phoneNumberRegex.test(phoneNumber);
-};
+    const phoneNumberRegex = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
+    return phoneNumberRegex.test(phoneNumber);
+  };
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -60,13 +68,8 @@ export const ProfileScreen = ({ navigation }) => {
     }
   };
 
-const nav = useNavigation();
-
   return (
     <View style={styles.container}>
-    <TouchableOpacity onPress={() => nav.goBack()} style={styles.backButton}>
-        <Text>Back</Text>
-      </TouchableOpacity>
       <Button title="Pick an image from camera roll" onPress={pickImage} />
       {profileImage ? (
         <Image source={{ uri: profileImage }} style={styles.profileImage} />
@@ -100,6 +103,7 @@ const styles = StyleSheet.create({
     margin: 10,
     borderWidth: 1,
     borderColor: 'gray',
+    borderRadius: 15,
   },
   switchContainer: {
     flexDirection: 'row',
@@ -107,16 +111,9 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   profileImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 20,
+    width: 100, 
+    height: 100, 
+    borderRadius: 50, 
     marginBottom: 20,
   },
-  backButton: {
-    padding: 10,
-    margin: 10,
-    backgroundColor: '#ddd',
-  },
 });
-
- 

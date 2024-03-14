@@ -35,11 +35,6 @@ export const OnboardingScreen = () => {
     }
   };
 
-  // const goToHomeScreen = async () => {
-  //   await AsyncStorage.setItem('onboardingCompleted', 'true');
-  //   navigation.navigate('Home');
-  // };
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -66,11 +61,6 @@ export const OnboardingScreen = () => {
       onPress={saveOnboardingData}
       disabled={!isFormValid()}
     />
-     {/* <Button
-        title="Next"
-        color="#841584" 
-        onPress={goToHomeScreen}
-      /> */}
     </View>
   );
 };
