@@ -2,14 +2,16 @@ import React from 'react';
 import { View, Image, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native'; 
 
-export const HomeScreenHeader = ({ profileImage, name }) => {
+const HomeHeader = ({ profileImage, name }) => {
   const navigation = useNavigation();
 
   const getInitials = (nameString) => {
-    const names = nameString.split(' ');
-    const initials = names.map(name => name.charAt(0)).join('');
-    return initials.toUpperCase();
-  };
+  if (!nameString) return '';  
+
+  const names = nameString.split(' ');
+  const initials = names.map(name => name.charAt(0)).join('');
+  return initials.toUpperCase();
+};
 
   return (
     <View style={styles.headerContainer}>
@@ -65,3 +67,5 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+
+export default HomeHeader;

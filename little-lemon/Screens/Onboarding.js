@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Image, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useUser } from '../Context/UserContext';
 
-export const OnboardingScreen = () => {
+const Onboarding = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const navigation = useNavigation();
+  const { saveOnboardingData } = useUser();
   
   const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -21,11 +22,11 @@ export const OnboardingScreen = () => {
     return isNameValid(name) && isValidEmail(email);
   };
 
-  const saveOnboardingData = async () => {
+ 
+   const handleSaveData = async () => {
     if (isFormValid()) {
       try {
-        await AsyncStorage.setItem('userData', JSON.stringify({ name, email }));
-        await AsyncStorage.setItem('onboardingCompleted', 'true');
+        await saveOnboardingData({ name, email });
         navigation.navigate('Home');
       } catch (error) {
         Alert.alert("Error", "Failed to save user data.");
@@ -58,7 +59,7 @@ export const OnboardingScreen = () => {
       title="Next"
       color="#841584" 
       style={styles.nextButton}
-      onPress={saveOnboardingData}
+      onPress={handleSaveData}
       disabled={!isFormValid()}
     />
     </View>
@@ -112,3 +113,5 @@ const styles = StyleSheet.create({
     borderRadius: 15,
   },
 });
+
+export default Onboarding;

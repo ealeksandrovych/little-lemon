@@ -1,54 +1,28 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, Button, Switch, Image, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native'; 
+import { useUser } from '../Context/UserContext';
 
-export const ProfileScreen = () => {
+const Profile = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [profileImage, setProfileImage] = useState(null);
   const [emailNotifications, setEmailNotifications] = useState(false);
+  const { userData, saveOnboardingData, logout } = useUser();
   const navigation = useNavigation();
 
   useEffect(() => {
-    (async () => {
-      const userData = await AsyncStorage.getItem('userData');
-      if (userData) {
-        const { name, email, phoneNumber, profileImage, emailNotifications } = JSON.parse(userData);
-        setName(name);
-        setEmail(email);
-        setPhoneNumber(phoneNumber);
-        setProfileImage(profileImage);
-        setEmailNotifications(emailNotifications);
-      }
-    })();
-  }, []);
-
-  const saveData = async () => {
-    if (!isValidPhoneNumber(phoneNumber)) {
-      Alert.alert("Invalid Phone Number", "Please enter a valid US phone number.");
-      return;
+    if (userData) {
+      setName(userData.name);
+      setEmail(userData.email);
+      setPhoneNumber(userData.phoneNumber);
+      setProfileImage(userData.profileImage);
+      setEmailNotifications(userData.emailNotifications);
     }
-    try {
-      await AsyncStorage.setItem('userData', JSON.stringify({ name, email, phoneNumber, profileImage, emailNotifications }));
-      Alert.alert("Data Saved", "Your profile information has been saved successfully.");
-    } catch (error) {
-      Alert.alert("Error", "Failed to save the data.");
-    }
-  };
-
-  // const logout = async () => {
-  //   await AsyncStorage.removeItem('userData');
-  //   navigation.navigate('Onboarding');
-  // };
-
-  const logout = async () => {
-    await AsyncStorage.removeItem('userData');
-    await AsyncStorage.setItem('onboardingCompleted', 'false');
-    navigation.navigate('Onboarding');
-  };
+  }, [userData]);
 
   const isValidPhoneNumber = (phoneNumber) => {
     const phoneNumberRegex = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
@@ -68,6 +42,19 @@ export const ProfileScreen = () => {
     }
   };
 
+  const handleSaveChanges = async () => {
+    if (isValidPhoneNumber(phoneNumber)) {
+      saveOnboardingData({ name, email, phoneNumber, profileImage, emailNotifications });
+    } else {
+      Alert.alert("Invalid phone number", "Please check the phone number and try again.");
+    }
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigation.navigate('Onboarding');
+  };
+
   return (
     <View style={styles.container}>
       <Button title="Pick an image from camera roll" onPress={pickImage} />
@@ -85,8 +72,8 @@ export const ProfileScreen = () => {
         <Text>Email Notifications</Text>
         <Switch value={emailNotifications} onValueChange={setEmailNotifications} />
       </View>
-      <Button title="Save Changes" onPress={saveData} />
-      <Button title="Logout" onPress={logout} color="#d9534f" />
+      <Button title="Save Changes" onPress={handleSaveChanges} />
+      <Button title="Logout" onPress={handleLogout} color="#d9534f" />
     </View>
   );
 };
@@ -94,8 +81,9 @@ export const ProfileScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
+    paddingTop: 20,
+    backgroundColor: '#4f34eb',
   },
   input: {
     width: '80%',
@@ -111,9 +99,41 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   profileImage: {
-    width: 100, 
-    height: 100, 
-    borderRadius: 50, 
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 20,
+    backgroundColor: '#f5f105',
+  },
+  profileImagePlaceholder: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#f5f105',
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    fontSize: 24,
+    fontWeight: 'bold',
     marginBottom: 20,
   },
+  saveButton: {
+    backgroundColor: '#007BFF',
+    color: 'white',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 20,
+    marginBottom: 20,
+  },
+  logoutButton: {
+    backgroundColor: '#d9534f',
+    color: 'white',
+    padding: 10,
+    borderRadius: 5,
+    marginVertical: 10,
+  },
+  buttonText: {
+    color: 'white',
+    textAlign: 'center',
+  }
 });
+export default Profile;

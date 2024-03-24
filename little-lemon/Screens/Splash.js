@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, Image } from 'react-native';
 
-export const SplashScreen = () => (
+const SplashScreen = () => (
   <View style={styles.container}>
     <Image
       source={require('/Users/eka-terina/Desktop/little-lemon/little-lemon/assets/Logo.png')} 
@@ -30,5 +30,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
 });
+
+export default SplashScreen;
 
  
